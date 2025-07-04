@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&family=Inter:wght@500;700&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1e3a8a, #7e22ce);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+      padding: 1rem;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      animation: slideIn 0.5s ease-out forwards;
+      transform: translateY(-100px);
+      opacity: 0;
+      width: 100%;
+    }
+    @keyframes slideIn {
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .input-field {
+      width: 100%;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      background: #e5e7eb;
+      transition: transform 0.3s ease, background 0.2s;
+      margin-bottom: 0.75rem;
+    }
+    .input-field:focus {
+      outline: none;
+      background: #d1d5db;
+      transform: scale(1.02);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+    }
+    .btn {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      margin-top: 0.75rem;
+    }
+    .btn-primary {
+      background: linear-gradient(to right, #7c3aed, #db2777);
+      color: white;
+      border: none;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s ease, height 0.4s ease;
+    }
+    .btn-primary:hover::after {
+      width: 300px;
+      height: 300px;
+    }
+    h2 {
+      color: #a5b4fc;
+      font-weight: 700;
+      font-size: 1.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      animation: pulse 2s infinite;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    #error {
+      color: #ef4444;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.875rem;
+      text-align: center;
+      margin-top: 0.75rem;
+      min-height: 1.5rem;
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 0.5rem;
+      }
+      .card {
+        transform: translateY(-50px);
+        animation: slideInMobile 0.5s ease-out forwards;
+      }
+      @keyframes slideInMobile {
+        to { transform: translateY(0); opacity: 1; }
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h2>Login to CSV Dashboard</h2>
+      <input type="text" id="username" placeholder="Username" class="input-field" />
+      <input type="password" id="password" placeholder="Password" class="input-field" />
+      <button onclick="login()" class="btn btn-primary">Login</button>
+      <p id="error"></p>
+    </div>
+  </div>
+
+  <script>
+    async function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+
+      const response = await fetch("/token", {
+        method: "POST",
+        headers: {
+          "Authorization": "Basic " + btoa(user + ":" + pass)
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        localStorage.setItem("token", result.access_token);
+        window.location.href = "/dashboard";
+      } else {
+        document.getElementById("error").textContent = "Invalid credentials!";
+      }
+    }
+  </script>
+</body>
+</html>

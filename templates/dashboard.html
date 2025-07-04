@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CSV Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&family=Inter:wght@500;700&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1e3a8a, #7e22ce);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      max-width: 1400px;
+      height: 100vh;
+      padding: 1rem;
+      gap: 1rem;
+    }
+    .controls {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 100%;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      scrollbar-width: thin;
+      scrollbar-color: #a5b4fc #1e293b;
+    }
+    .controls::-webkit-scrollbar {
+      width: 8px;
+    }
+    .controls::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    .controls::-webkit-scrollbar-thumb {
+      background: #a5b4fc;
+      border-radius: 4px;
+    }
+    .output-container {
+      flex: 1;
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      animation: slideIn 0.5s ease-out forwards;
+      transform: translateX(-100px);
+      opacity: 0;
+    }
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
+    @keyframes slideIn {
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .input-field {
+      width: 100%;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      background: #e5e7eb;
+      transition: transform 0.3s ease, background 0.2s;
+    }
+    .input-field:focus {
+      outline: none;
+      background: #d1d5db;
+      transform: scale(1.02);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+    }
+    .btn {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary {
+      background: linear-gradient(to right, #7c3aed, #db2777);
+      color: white;
+      border: none;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s ease, height 0.4s ease;
+    }
+    .btn-primary:hover::after {
+      width: 300px;
+      height: 300px;
+    }
+    .btn-secondary {
+      background: linear-gradient(to right, #6b7280, #374151);
+      color: white;
+      border: none;
+    }
+    .btn-secondary:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .btn-secondary::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s ease, height 0.4s ease;
+    }
+    .btn-secondary:hover::after {
+      width: 300px;
+      height: 300px;
+    }
+    .output {
+      background: #1e293b;
+      color: #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      font-family: 'Roboto Mono', monospace;
+      flex: 1;
+      overflow-y: auto;
+      animation: fadeIn 0.5s ease-out;
+      scrollbar-width: thin;
+      scrollbar-color: #a5b4fc #1e293b;
+    }
+    .output::-webkit-scrollbar {
+      width: 8px;
+    }
+    .output::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    .output::-webkit-scrollbar-thumb {
+      background: #a5b4fc;
+      border-radius: 4px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    h3 {
+      color: #a5b4fc;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+        padding: 0.5rem;
+      }
+      .controls, .output-container {
+        flex: none;
+        width: 100%;
+        max-height: 50vh;
+      }
+      .controls {
+        overflow-y: auto;
+      }
+      .card {
+        transform: translateY(-50px);
+        animation: slideInMobile 0.5s ease-out forwards;
+      }
+      @keyframes slideInMobile {
+        to { transform: translateY(0); opacity: 1; }
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="controls">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-white">CSV Control Hub</h2>
+        <button onclick="logout()" class="btn btn-secondary">Logout</button>
+      </div>
+      <div class="card">
+        <h3>Upload CSV</h3>
+        <div class="flex flex-col space-y-2">
+          <input type="file" id="csvfile" class="input-field" />
+          <button onclick="uploadCSV()" class="btn btn-primary">Upload</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>View Columns</h3>
+        <div class="flex flex-col space-y-2">
+          <input type="text" id="columnFilter" placeholder="Search columns..." class="input-field" />
+          <button onclick="getColumns()" class="btn btn-primary">Get Columns</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Search Data</h3>
+        <div class="flex flex-col space-y-2">
+          <input type="text" id="dataFilter" placeholder="Search data (any column)..." class="input-field" />
+          <button onclick="getData()" class="btn btn-primary">Get Data</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>View Logs</h3>
+        <button onclick="getLogs()" class="btn btn-primary">Show Logs</button>
+      </div>
+      <div class="card">
+        <h3>Delete Data</h3>
+        <div class="space-y-2">
+          <input type="text" id="deleteCols" placeholder="Columns (comma-separated)" class="input-field" />
+          <input type="text" id="deleteCol" placeholder="Column (row deletion)" class="input-field" />
+          <input type="text" id="deleteVal" placeholder="Value (row deletion)" class="input-field" />
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="dropTable" class="h-4 w-4 text-indigo-600 rounded focus:ring-indigo-500" />
+            <span class="text-gray-700">Drop whole table</span>
+          </label>
+          <button onclick="deleteData()" class="btn btn-primary">Delete</button>
+        </div>
+      </div>
+    </div>
+    <div class="output-container">
+      <div class="flex justify-between items-center mb-2">
+        <h3>Output</h3>
+        <button onclick="clearOutput()" class="btn btn-secondary">Clear Output</button>
+      </div>
+      <pre id="output" class="output">Waiting for action...</pre>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/static/index.html";
+    }
+
+    async function uploadCSV() {
+      const fileInput = document.getElementById("csvfile");
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      const res = await fetch("/upload", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      const result = await res.json();
+      document.getElementById("output").innerText = JSON.stringify(result, null, 2);
+    }
+
+    async function getColumns() {
+      const res = await fetch("/columns", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const result = await res.json();
+      document.getElementById("output").innerText = JSON.stringify(result, null, 2);
+    }
+
+    async function getData() {
+      const res = await fetch("/data", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const result = await res.json();
+      document.getElementById("output").innerText = JSON.stringify(result, null, 2);
+    }
+
+    async function getLogs() {
+      const res = await fetch("/logs", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const result = await res.json();
+      document.getElementById("output").innerText = result.logs.join("\n");
+    }
+
+    async function deleteData() {
+      const dropTable = document.getElementById("dropTable").checked;
+      const deleteCols = document.getElementById("deleteCols").value;
+      const deleteCol = document.getElementById("deleteCol").value;
+      const deleteVal = document.getElementById("deleteVal").value;
+
+      let query = "/delete?";
+      if (dropTable) query += "drop_table=true";
+      else if (deleteCols) query += "columns=" + encodeURIComponent(deleteCols);
+      else if (deleteCol && deleteVal) query += `column=${encodeURIComponent(deleteCol)}&value=${encodeURIComponent(deleteVal)}`;
+      else return alert("Specify a valid delete operation");
+
+      const res = await fetch(query, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const result = await res.json();
+      document.getElementById("output").innerText = JSON.stringify(result, null, 2);
+    }
+
+    function clearOutput() {
+      document.getElementById("output").innerText = "";
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      window.location.href = "/static/index.html";
+    }
+  </script>
+</body>
+</html>
