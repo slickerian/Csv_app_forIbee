@@ -15,19 +15,6 @@ Requirements
 ------------
 Install the requirements.txt file: pip install -r requirements.txt
 
-Project Structure
------------------
-.
-├── main.py                  # FastAPI backend
-├── .env                     # Environment variables (AUTH_USERNAME, AUTH_PASSWORD, ACCESS_TOKEN)
-├── static/
-│   └── login.html           # login UI
-├── templates/
-│   └── dashboard.html       # the main dashboard
-├── data.db                  # SQLite database (auto-created)
-├── activity.log             # Logs access (auto-created)
-└── README.txt               # This file
-
 Setup Instructions
 ------------------
 
